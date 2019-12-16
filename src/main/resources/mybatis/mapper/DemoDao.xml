@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.mybatis.demo.dao.DemoDao">
+    <!--定义查询结果集，返回的数据对应的实体类属性名、数据类型-->
+    <resultMap id="BaseResultMap" type="com.spring.mybatis.demo.bean.Demo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <!--自定义查询时，所使用的列-->
+    <sql id="Base_Column_List">
+        id, `name`
+    </sql>
+    <!--查询全部-->
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM demo
+    </select>
+    <!--根据指定条件参数，查询-->
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from demo
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <!--固定修改语句写法-->
+    <update id="updateById" parameterType="com.spring.mybatis.demo.bean.Demo">
+        update demo
+        set name = #{name,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <!--选择性修改语句，修改字段不为null才修改-->
+    <update id="updateByIdSelective" parameterType="com.spring.mybatis.demo.bean.Demo">
+        update demo
+        <set>
+            <if test="name != null">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <!--固定插入语句写法-->
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.spring.mybatis.demo.bean.Demo"
+            useGeneratedKeys="true">
+        insert into demo (`name`)
+        values (#{name,jdbcType=VARCHAR})
+    </insert>
+    <!--添加选择性语句，插入的字段不为null才写入-->
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.spring.mybatis.demo.bean.Demo"
+            useGeneratedKeys="true">
+        insert into demo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                `name`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <!--删除语句-->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete
+        from demo
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+</mapper>
